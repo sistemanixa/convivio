@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CONVIVIO - Gestión Online v6.3</title>
+<title>CONVIVIO - Gestión Online v6.4</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080908">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -58,6 +58,17 @@ label{display:block;margin:14px 0 7px;color:var(--muted);font-size:12px;font-wei
 </style>
 </head>
 <body class="dark">
+<audio id="brindisAudio" src="Soledad - Brindis (Official Video).mp3" preload="none"></audio>
+<div class="login-overlay hide" id="pwOverlay" style="z-index:97;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)">
+  <div class="login-card">
+    <h1 style="font-size:17px;letter-spacing:2px">CONFIRMAR BORRADO</h1>
+    <p class="login-sub">Esto borra TODOS los datos de CONVIVIO en la nube y en todos los dispositivos. Ingresá tu contraseña para confirmar.</p>
+    <input type="password" id="pwConfirm" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')confirmarBorrado()">
+    <button class="btn-login" id="pwBtn" style="background:var(--red)" onclick="confirmarBorrado()">Borrar todo</button>
+    <button class="btn-login" style="background:var(--input);color:var(--text);margin-top:8px" onclick="cerrarPwOverlay()">Cancelar</button>
+    <div class="login-err" id="pwErr"></div>
+  </div>
+</div>
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <h1>CONVIVIO</h1>
@@ -74,7 +85,7 @@ label{display:block;margin:14px 0 7px;color:var(--muted);font-size:12px;font-wei
 <main class="content">
 <section id="inicio" class="section active">
   <div class="hero"><div class="hero-head"><h2>Resumen del mes</h2><div class="month">▦ <span id="mesActual"></span></div></div><div class="dash-grid" id="dash"></div></div>
-  <div class="card"><div class="card-title"><h2>Acciones rápidas</h2></div><div class="quick-grid"><button class="quick" onclick="go('ventas')"><i>＋</i>Nueva venta</button><button class="quick" onclick="go('gastos')"><i>↙</i>Nuevo gasto</button><button class="quick" onclick="go('carta')"><i>☰</i>Carta</button><button class="quick" onclick="go('productos')"><i>□</i>Producto</button><button class="quick" onclick="go('clientes')"><i>♡</i>Cliente</button></div></div>
+  <div class="card"><div class="card-title"><h2>Acciones rápidas</h2></div><div class="quick-grid"><button class="quick" onclick="go('ventas')"><i>＋</i>Nueva venta</button><button class="quick" onclick="go('gastos')"><i>↙</i>Nuevo gasto</button><button class="quick" onclick="go('carta')"><i>☰</i>Carta</button><button class="quick" onclick="go('productos')"><i>◈</i>Producto</button><button class="quick" onclick="go('clientes')"><i>♡</i>Cliente</button></div></div>
   <div class="card"><div class="card-title"><h2>Últimos movimientos</h2><span class="badge">Nube</span></div><div id="ultimos" class="list"></div></div>
   <div class="quote">Por ella, por vos, por todo lo que aún queda por lograr.<small>Su amor es mi fuerza, mi motor es mi sueño.</small><span class="heart">♡</span></div>
 </section>
@@ -82,7 +93,7 @@ label{display:block;margin:14px 0 7px;color:var(--muted);font-size:12px;font-wei
 <section id="productos" class="section"><div class="card"><h2>Nuevo producto</h2><label>Nombre</label><input id="prodNombre" placeholder="Ej: Tarta individual"><div class="row"><div><label>Costo unitario</label><input id="prodCosto" type="number"></div><div><label>Precio sugerido</label><input id="prodPrecio" type="number"></div></div><label>Categoría</label><input id="prodCategoria" placeholder="Dulce, salado, vianda..."><button class="btn full" onclick="guardarProducto()">Guardar producto</button></div><div class="card"><h2>Productos cargados</h2><div id="listaProductos" class="list"></div></div></section>
 <section id="clientes" class="section"><div class="card"><h2>Nuevo cliente</h2><label>Nombre</label><input id="cliNombre" placeholder="Ej: Laura"><label>Teléfono</label><input id="cliTel" placeholder="Opcional"><label>Nota</label><textarea id="cliNota" placeholder="Gustos, dirección, observaciones..."></textarea><button class="btn full" onclick="guardarCliente()">Guardar cliente</button></div><div class="card"><h2>Clientes cargados</h2><div id="listaClientes" class="list"></div></div></section>
 <section id="gastos" class="section"><div class="card"><h2>Nuevo gasto</h2><label>Detalle</label><input id="gastoDetalle" placeholder="Ej: Harina, packaging, envío"><div class="row"><div><label>Monto</label><input id="gastoMonto" type="number"></div><div><label>Categoría</label><input id="gastoCategoria" placeholder="Insumos"></div></div><button class="btn full" onclick="guardarGasto()">Guardar gasto</button></div><div class="card"><h2>Gastos cargados</h2><div id="listaGastos" class="list"></div></div></section>
-<section id="carta" class="section"><div class="card"><h2>Nuevo ítem de carta</h2><label>Título</label><input id="cartaTitulo" placeholder="Ej: Picada Convivio para 2"><label>Descripción</label><textarea id="cartaDesc" placeholder="Ej: fiambres, quesos, panificados y dips"></textarea><label>Precio de carta</label><input id="cartaPrecio" type="number" placeholder="0"><label>Imagen</label><input type="file" id="cartaImg" accept="image/*" onchange="imagenCarta(event)"><img id="cartaPrev" class="carta-prev" alt=""><label>Productos vinculados</label><div class="row"><div><select id="cartaProdSelect"></select></div><div style="max-width:110px"><input id="cartaProdCant" type="number" min="1" value="1"></div></div><button class="btn secondary full" onclick="agregarLineaCarta()" style="margin-top:8px">＋ Agregar producto</button><div id="cartaLineasForm" class="list"></div><button class="btn full" onclick="guardarItemCarta()">Guardar ítem de carta</button></div><div class="card"><h2>Carta cargada</h2><div id="listaCarta" class="list"></div></div></section><section id="config" class="section"><div class="card"><h2>Configuración</h2><div class="switch"><div><b>Modo oscuro</b><br><small>Se guarda automáticamente.</small></div><div class="toggle" onclick="toggleDark()"><i></i></div></div><button class="btn secondary full" onclick="exportar()">Exportar respaldo</button><label>Importar respaldo</label><input type="file" id="importFile" accept="application/json" onchange="importar(event)"><button class="btn danger full" onclick="borrarTodo()">Borrar todos los datos</button></div><div class="card"><h2>Sesión</h2><p class="empty">Conectado como <b id="sesionEmail">—</b></p><button class="btn danger full" onclick="cerrarSesion()">Cerrar sesión</button></div><div class="card"><h2>Acerca de</h2><p class="empty">CONVIVIO v6 guarda todo en la nube y se sincroniza al instante entre tus dispositivos. Si te quedás sin internet, seguís viendo la última copia guardada en este dispositivo.</p></div></section>
+<section id="carta" class="section"><div class="card"><h2>Nuevo ítem de carta</h2><label>Título</label><input id="cartaTitulo" placeholder="Ej: Picada Convivio para 2"><label>Descripción</label><textarea id="cartaDesc" placeholder="Ej: fiambres, quesos, panificados y dips"></textarea><label>Precio de carta</label><input id="cartaPrecio" type="number" placeholder="0"><label>Imagen</label><input type="file" id="cartaImg" accept="image/*" onchange="imagenCarta(event)"><img id="cartaPrev" class="carta-prev" alt=""><label>Productos vinculados</label><div class="row"><div><select id="cartaProdSelect"></select></div><div style="max-width:110px"><input id="cartaProdCant" type="number" min="1" value="1"></div></div><button class="btn secondary full" onclick="agregarLineaCarta()" style="margin-top:8px">＋ Agregar producto</button><div id="cartaLineasForm" class="list"></div><button class="btn full" onclick="guardarItemCarta()">Guardar ítem de carta</button></div><div class="card"><h2>Carta cargada</h2><div id="listaCarta" class="list"></div></div></section><section id="config" class="section"><div class="card"><h2>Configuración</h2><div class="switch"><div><b>Modo oscuro</b><br><small>Se guarda automáticamente.</small></div><div class="toggle" onclick="toggleDark()"><i></i></div></div><button class="btn secondary full" onclick="exportar()">Exportar respaldo</button><label>Importar respaldo</label><input type="file" id="importFile" accept="application/json" onchange="importar(event)"><button class="btn danger full" onclick="borrarTodo()">Borrar todos los datos</button></div><div class="card"><h2>Sesión</h2><p class="empty">Conectado como <b id="sesionEmail">—</b></p><button class="btn secondary full" id="btnMusica" onclick="toggleMusica()">🎵 Música de bienvenida</button><button class="btn danger full" onclick="cerrarSesion()">Cerrar sesión</button></div><div class="card"><h2>Acerca de</h2><p class="empty">CONVIVIO v<span id="appVer"></span> guarda todo en la nube y se sincroniza al instante entre tus dispositivos. Si te quedás sin internet, seguís viendo la última copia guardada en este dispositivo.</p></div></section>
 </main></div>
 <nav class="bottom-nav"><div class="nav-inner"><button class="nav-btn active" data-sec="inicio" onclick="go('inicio')"><span>⌂</span>Inicio</button><button class="nav-btn" data-sec="ventas" onclick="go('ventas')"><span>🛒</span>Ventas</button><button class="nav-btn" data-sec="productos" onclick="go('productos')"><span>□</span>Productos</button><button class="nav-btn" data-sec="clientes" onclick="go('clientes')"><span>♡</span>Clientes</button><button class="nav-btn" onclick="openMore()"><span>•••</span>Más</button></div></nav>
 <div class="drawer" id="drawer" onclick="closeMore(event)"><div class="drawer-panel"><h2 style="margin-bottom:14px">Más opciones</h2><div class="drawer-grid"><button class="btn secondary" onclick="go('carta');hideDrawer()">Carta</button><button class="btn secondary" onclick="go('gastos');hideDrawer()">Gastos</button><button class="btn secondary" onclick="go('config');hideDrawer()">Configuración</button><button class="btn secondary" onclick="exportar()">Exportar</button><button class="btn secondary" onclick="toggleDark()">Claro / Oscuro</button></div></div></div>
@@ -92,7 +103,9 @@ label{display:block;margin:14px 0 7px;color:var(--muted);font-size:12px;font-wei
 <script>
 const firebaseConfig={apiKey:"AIzaSyC5GlO4YKSxm_YB7OglMKnL5G-aqJt8YbY",authDomain:"nixa-bariloche.firebaseapp.com",databaseURL:"https://nixa-bariloche-default-rtdb.firebaseio.com",projectId:"nixa-bariloche",storageBucket:"nixa-bariloche.firebasestorage.app",messagingSenderId:"421012042226",appId:"1:421012042226:web:c62df0fadbbec5c4d0bb6b"};
 firebase.initializeApp(firebaseConfig);
+const APP_VERSION='6.4';
 const fbAuth=firebase.auth(),fbDB=firebase.database(),FB_REF='convivio/data';
+document.title='CONVIVIO - Gestión Online v'+APP_VERSION;
 let _syncIniciado=false;
 function loginConvivio(){
   const em=document.getElementById('loginEmail').value.trim(),pw=document.getElementById('loginPass').value;
@@ -104,6 +117,10 @@ function loginConvivio(){
     err.textContent=msgs[e.code]||('Error: '+e.code);
   }).finally(()=>{btn.disabled=false;btn.textContent='Ingresar'});
 }
+function musicaActiva(){return localStorage.getItem('convivio_musica')!=='off'}
+function actualizarBtnMusica(){const b=document.getElementById('btnMusica');if(b)b.textContent=musicaActiva()?'🎵 Música de bienvenida: Activada':'🔇 Música de bienvenida: Desactivada'}
+function toggleMusica(){const on=!musicaActiva();localStorage.setItem('convivio_musica',on?'on':'off');const a=document.getElementById('brindisAudio');if(!on){a.pause();a.currentTime=0}else{a.currentTime=0;a.play().catch(()=>{})}actualizarBtnMusica();aviso(on?'Música de bienvenida activada 🥂':'Música de bienvenida desactivada')}
+function reproducirBrindis(){if(!musicaActiva())return;const a=document.getElementById('brindisAudio');a.volume=.6;a.currentTime=0;a.play().catch(()=>{const h=()=>{if(musicaActiva()&&a.paused)a.play().catch(()=>{})};document.addEventListener('pointerdown',h,{once:true})})}
 let _toastT=null;
 function aviso(msg,esError){let t=document.getElementById('toastConvivio');if(!t){t=document.createElement('div');t.id='toastConvivio';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.toggle('err',!!esError);t.classList.add('show');clearTimeout(_toastT);_toastT=setTimeout(()=>t.classList.remove('show'),3200)}
 function cerrarSesion(){if(confirm('¿Cerrar sesión de CONVIVIO?')){fbDB.ref(FB_REF).off();_syncIniciado=false;fbAuth.signOut();aviso('Sesión cerrada. ¡Hasta luego!')}}
@@ -112,9 +129,12 @@ fbAuth.onAuthStateChanged(u=>{
   if(u){
     ov.classList.add('hide');
     const se=document.getElementById('sesionEmail');if(se)se.textContent=u.email||'—';
+    const av=document.getElementById('appVer');if(av)av.textContent=APP_VERSION;
+    go('inicio');actualizarBtnMusica();reproducirBrindis();
     iniciarSync();
   }else{
     fbDB.ref(FB_REF).off();_syncIniciado=false;
+    const au=document.getElementById('brindisAudio');au.pause();au.currentTime=0;
     ov.classList.remove('hide');
     document.getElementById('splash').classList.add('hide');
   }
@@ -172,9 +192,11 @@ function renderDash(){let now=new Date(),m=now.getMonth(),y=now.getFullYear();le
 function ultimos(){let mov=[...data.ventas.map(x=>({...x,t:'Venta',n:x.producto,m:x.total})),...data.gastos.map(x=>({...x,t:'Gasto',n:x.detalle,m:-x.monto}))].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).slice(0,6);document.getElementById('ultimos').innerHTML=mov.length?mov.map(x=>`<div class="item"><div><b>${x.t}: ${x.n}</b><small>${new Date(x.fecha).toLocaleDateString('es-AR')} · ${money(x.m)}</small></div></div>`).join(''):'<p class="empty">Todavía no hay movimientos.</p>'}
 function exportar(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='convivio-respaldo.json';a.click()}
 function importar(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();aviso('Respaldo importado.')}catch(err){aviso('Archivo inválido.')}};r.readAsText(f)}
-function borrarTodo(){if(confirm('ATENCIÓN: esto borra TODOS los datos de CONVIVIO en la nube y en todos los dispositivos. ¿Continuar?')&&confirm('¿Segura? Esta acción no se puede deshacer.')){data={productos:[],clientes:[],ventas:[],gastos:[],carta:[]};save()}}
+function borrarTodo(){document.getElementById('pwErr').textContent='';document.getElementById('pwConfirm').value='';document.getElementById('pwOverlay').classList.remove('hide')}
+function cerrarPwOverlay(){document.getElementById('pwOverlay').classList.add('hide')}
+function confirmarBorrado(){const u=fbAuth.currentUser;if(!u)return;const pw=document.getElementById('pwConfirm').value,err=document.getElementById('pwErr'),btn=document.getElementById('pwBtn');if(!pw){err.textContent='Ingresá tu contraseña.';return}btn.disabled=true;err.textContent='';const cred=firebase.auth.EmailAuthProvider.credential(u.email,pw);u.reauthenticateWithCredential(cred).then(()=>{data={productos:[],clientes:[],ventas:[],gastos:[],carta:[]};save();cerrarPwOverlay();aviso('Todos los datos fueron borrados.')}).catch(e=>{err.textContent=(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')?'Contraseña incorrecta.':'Error: '+e.code}).finally(()=>{btn.disabled=false})}
 document.getElementById('ventaProducto').addEventListener('change',()=>{let p=data.productos.find(x=>x.id===val('ventaProducto'));document.getElementById('ventaPrecio').value=p?p.precio:''});load();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW:',e))}
 </script>
 </body>
-</html>
+                                                                                                                           </html>
