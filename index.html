@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CONVIVIO - Gestión Online v6.2</title>
+<title>CONVIVIO - Gestión Online v6.3</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080908">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CONVIVIO">
 <style>
 :root{
   --bg:#f6efe4;--bg2:#e7caa4;--card:rgba(255,253,248,.86);--card2:#fffaf2;--text:#211812;--muted:#806f61;
@@ -167,6 +174,7 @@ function exportar(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'app
 function importar(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();aviso('Respaldo importado.')}catch(err){aviso('Archivo inválido.')}};r.readAsText(f)}
 function borrarTodo(){if(confirm('ATENCIÓN: esto borra TODOS los datos de CONVIVIO en la nube y en todos los dispositivos. ¿Continuar?')&&confirm('¿Segura? Esta acción no se puede deshacer.')){data={productos:[],clientes:[],ventas:[],gastos:[],carta:[]};save()}}
 document.getElementById('ventaProducto').addEventListener('change',()=>{let p=data.productos.find(x=>x.id===val('ventaProducto'));document.getElementById('ventaPrecio').value=p?p.precio:''});load();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW:',e))}
 </script>
 </body>
 </html>
