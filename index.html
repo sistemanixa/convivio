@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CONVIVIO - Gestión Online v7.2</title>
+<title>CONVIVIO - Gestión Online v7.3</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080908">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -75,6 +75,26 @@ label{display:block;margin:14px 0 7px;color:var(--muted);font-size:12px;font-wei
 .login-card .btn-login:disabled{opacity:.6}
 .login-err{min-height:18px;margin-top:12px;color:var(--red);font-size:12px;font-weight:700}
 .login-overlay.hide{display:none}
+/* ── v7.3: dashboard compacto en pantallas chicas ── */
+@media(max-width:560px){
+.hero{padding:16px 14px}
+.hero-head h2{font-size:19px}
+.dash-grid{gap:9px;margin-top:14px}
+.kpi{flex-direction:column;align-items:flex-start;gap:8px;padding:13px 14px;min-height:0;border-radius:20px}
+.kpi .ico{width:34px;height:34px;font-size:17px}
+.kpi small{font-size:9.5px;letter-spacing:.7px}
+.kpi b{font-size:clamp(16px,5.6vw,22px);white-space:nowrap;margin-top:3px;letter-spacing:-.5px}
+.kpi span{font-size:10.5px;line-height:1.3}
+.kpi.wide{flex-direction:row;align-items:center;gap:12px}
+.kpi.wide .ico{width:40px;height:40px;font-size:19px}
+.quick-grid{gap:9px}
+.quick{padding:14px 8px;font-size:12.5px}
+.quick i{width:44px;height:44px;font-size:20px;margin-bottom:8px}
+}
+@media(max-width:360px){
+.kpi b{font-size:15px}
+.kpi .ico{width:30px;height:30px;font-size:15px}
+}
 </style>
 </head>
 <body class="dark">
@@ -134,7 +154,7 @@ label{display:block;margin:14px 0 7px;color:var(--muted);font-size:12px;font-wei
 <script>
 const firebaseConfig={apiKey:"AIzaSyC5GlO4YKSxm_YB7OglMKnL5G-aqJt8YbY",authDomain:"nixa-bariloche.firebaseapp.com",databaseURL:"https://nixa-bariloche-default-rtdb.firebaseio.com",projectId:"nixa-bariloche",storageBucket:"nixa-bariloche.firebasestorage.app",messagingSenderId:"421012042226",appId:"1:421012042226:web:c62df0fadbbec5c4d0bb6b"};
 firebase.initializeApp(firebaseConfig);
-const APP_VERSION='7.2';
+const APP_VERSION='7.3';
 const fbAuth=firebase.auth(),fbDB=firebase.database(),FB_REF='convivio/data';
 document.title='CONVIVIO - Gestión Online v'+APP_VERSION;
 let _syncIniciado=false;
